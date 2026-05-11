@@ -9,12 +9,14 @@ import { ProductCard } from "./ProductCard";
 import { ProductSkeleton } from "@/components/ui/ProductSkeleton";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { useShop } from "@/providers/ShopProvider";
 
 type ActiveCategory = ProductCategory | "todos";
 
 export function ProductGrid() {
   const [activeCategory, setActiveCategory] = useState<ActiveCategory>("todos");
   const [isLoading, setIsLoading] = useState(true);
+  const { searchQuery, setSearchQuery } = useShop();
 
   useEffect(() => {
     const timer = window.setTimeout(() => setIsLoading(false), 650);
@@ -22,12 +24,26 @@ export function ProductGrid() {
   }, []);
 
   const filteredProducts = useMemo(() => {
-    if (activeCategory === "todos") {
-      return products;
+    const normalizedQuery = normalizeSearch(searchQuery);
+    const baseProducts =
+      activeCategory === "todos" || normalizedQuery
+        ? products
+        : products.filter((product) => product.category === activeCategory);
+
+    if (!normalizedQuery) {
+      return baseProducts;
     }
 
-    return products.filter((product) => product.category === activeCategory);
-  }, [activeCategory]);
+    return baseProducts.filter((product) => {
+      const normalizedName = normalizeSearch(product.name);
+      const nameWords = normalizedName.split(" ");
+
+      return (
+        normalizedName.startsWith(normalizedQuery) ||
+        nameWords.some((word) => word.startsWith(normalizedQuery))
+      );
+    });
+  }, [activeCategory, searchQuery]);
 
   function handleCategoryChange(category: ActiveCategory) {
     setActiveCategory(category);
@@ -65,6 +81,24 @@ export function ProductGrid() {
           </div>
         </Reveal>
 
+        {searchQuery.trim() ? (
+          <div className="mt-6 flex flex-col items-start justify-between gap-3 rounded-2xl border border-gold/20 bg-gold/10 px-5 py-4 text-sm text-white/72 sm:flex-row sm:items-center">
+            <span>
+              Busca ativa por{" "}
+              <strong className="font-semibold text-gold">
+                &quot;{searchQuery.trim()}&quot;
+              </strong>
+            </span>
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="rounded-full border border-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-white transition hover:border-gold/50 hover:text-gold"
+            >
+              Limpar busca
+            </button>
+          </div>
+        ) : null}
+
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <AnimatePresence mode="popLayout">
             {isLoading
@@ -83,7 +117,24 @@ export function ProductGrid() {
                 ))}
           </AnimatePresence>
         </div>
+        {!isLoading && filteredProducts.length === 0 ? (
+          <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.04] px-6 py-12 text-center">
+            <p className="font-display text-3xl text-white">Nenhuma peça encontrada</p>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/56">
+              Tente buscar pelo início do nome do produto ou limpe a busca para voltar à
+              coleção completa.
+            </p>
+          </div>
+        ) : null}
       </div>
     </section>
   );
+}
+
+function normalizeSearch(value: string) {
+  return value
+    .trim()
+    .toLocaleLowerCase("pt-BR")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }

@@ -4,8 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, Search, ShoppingBag, UserRound, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useShop } from "@/providers/ShopProvider";
 
 const navItems = [
   { label: "Coleção", href: "#produtos" },
@@ -17,6 +18,9 @@ const navItems = [
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const { cartCount, searchQuery, setSearchQuery } = useShop();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -31,6 +35,21 @@ export function Header() {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (isSearchOpen) {
+      searchInputRef.current?.focus();
+    }
+  }, [isSearchOpen]);
+
+  function handleSearchToggle() {
+    setIsSearchOpen((value) => !value);
+  }
+
+  function handleSearchChange(query: string) {
+    setSearchQuery(query);
+    document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
     <header
@@ -74,13 +93,51 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <button
-            type="button"
-            aria-label="Buscar produtos"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/72 transition hover:border-gold/40 hover:text-gold"
-          >
-            <Search size={18} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Buscar produtos"
+              onClick={handleSearchToggle}
+              className={cn(
+                "flex h-11 w-11 items-center justify-center rounded-full border text-white/72 transition hover:border-gold/40 hover:text-gold",
+                isSearchOpen || searchQuery
+                  ? "border-gold/45 bg-gold/10 text-gold"
+                  : "border-white/10 bg-white/5"
+              )}
+            >
+              <Search size={18} />
+            </button>
+            <AnimatePresence>
+              {isSearchOpen ? (
+                <motion.div
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: 270, opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative overflow-hidden"
+                >
+                  <input
+                    ref={searchInputRef}
+                    type="search"
+                    value={searchQuery}
+                    onChange={(event) => handleSearchChange(event.target.value)}
+                    placeholder="Buscar produto..."
+                    className="h-11 w-[270px] rounded-full border border-white/10 bg-black/48 px-5 pr-11 text-sm text-white outline-none backdrop-blur-xl placeholder:text-white/36 focus:border-gold/50"
+                  />
+                  {searchQuery ? (
+                    <button
+                      type="button"
+                      aria-label="Limpar busca"
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-white/50 transition hover:bg-white/10 hover:text-gold"
+                    >
+                      <X size={15} />
+                    </button>
+                  ) : null}
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </div>
           <Link
             href="/account"
             aria-label="Minha conta"
@@ -94,9 +151,11 @@ export function Header() {
             className="relative flex h-11 w-11 items-center justify-center rounded-full border border-gold/30 bg-gold/10 text-gold transition hover:bg-gold hover:text-black"
           >
             <ShoppingBag size={18} />
-            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-black">
-              2
-            </span>
+            {cartCount > 0 ? (
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-black">
+                {cartCount}
+              </span>
+            ) : null}
           </Link>
         </div>
 
@@ -132,6 +191,19 @@ export function Header() {
                   </Link>
                 ))}
               </nav>
+              <div className="relative mt-4">
+                <Search
+                  size={17}
+                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gold"
+                />
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => handleSearchChange(event.target.value)}
+                  placeholder="Buscar produto..."
+                  className="h-12 w-full rounded-full border border-white/10 bg-white/5 pl-11 pr-4 text-sm text-white outline-none placeholder:text-white/36 focus:border-gold/50"
+                />
+              </div>
               <div className="mt-5 grid grid-cols-2 gap-3">
                 <Link
                   href="/account"
@@ -147,7 +219,7 @@ export function Header() {
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-gold px-4 py-3 text-sm font-semibold text-black"
                 >
                   <ShoppingBag size={17} />
-                  Carrinho
+                  Carrinho {cartCount > 0 ? `(${cartCount})` : ""}
                 </Link>
               </div>
             </div>

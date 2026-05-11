@@ -93,7 +93,7 @@ export const products: Product[] = [
     description: "Bolsa compacta com ferragens douradas e toque atemporal.",
     price: 399.9,
     image:
-      "https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=1200&q=85"
+      "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=1200&q=85"
   },
   {
     id: "joias-signature",
