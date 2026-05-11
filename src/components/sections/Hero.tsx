@@ -60,23 +60,6 @@ export function Hero() {
           transition={{ duration: 0.7, delay: 0.45 }}
           className="mt-12 grid max-w-3xl grid-cols-3 gap-3 text-center sm:gap-4"
         >
-          {[
-            ["12k+", "clientes"],
-            ["4.9", "avaliação"],
-            ["48h", "envio"]
-          ].map(([value, label]) => (
-            <div
-              key={label}
-              className="rounded-2xl border border-white/10 bg-white/[0.06] px-3 py-4 backdrop-blur-xl"
-            >
-              <strong className="block font-display text-2xl text-gold md:text-3xl">
-                {value}
-              </strong>
-              <span className="text-[11px] uppercase tracking-[0.2em] text-white/56">
-                {label}
-              </span>
-            </div>
-          ))}
         </motion.div>
       </div>
     </section>

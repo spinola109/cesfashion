@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, Search, ShoppingBag, UserRound, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -16,6 +17,7 @@ const navItems = [
 ];
 
 export function Header() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -51,6 +53,16 @@ export function Header() {
     document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  function handleLogoClick(event: React.MouseEvent<HTMLAnchorElement>) {
+    if (pathname !== "/") {
+      return;
+    }
+
+    event.preventDefault();
+    setIsOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   return (
     <header
       className={cn(
@@ -61,7 +73,7 @@ export function Header() {
       )}
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
-        <Link href="/" className="group inline-flex items-center gap-3">
+        <Link href="/" onClick={handleLogoClick} className="group inline-flex items-center gap-3">
           <span className="relative h-12 w-12 overflow-hidden rounded-full border border-gold/45 bg-black shadow-gold-soft ring-1 ring-white/10 transition duration-300 group-hover:border-gold group-hover:shadow-[0_18px_42px_rgba(212,175,55,0.22)]">
             <Image
               src="/brand/cs-fashion-logo.jpg"
