@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils";
 import { useShop } from "@/providers/ShopProvider";
 
 const navItems = [
-  { label: "Coleção", href: "#produtos" },
+  { label: "Produtos", href: "#produtos" },
   { label: "Vestidos", href: "#produtos" },
-  { label: "Marca", href: "#sobre" },
-  { label: "Atelier", href: "#destaques" }
+  { label: "Conjuntos", href: "#produtos" },
+  { label: "Acessórios", href: "#produtos" }
 ];
 
 export function Header() {

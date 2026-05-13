@@ -1,6 +1,6 @@
-import type { Product, ProductCategory } from "@/types/product";
+import type { Product, ProductCategoryOption } from "@/types/product";
 
-export const categories: Array<{ id: ProductCategory | "todos"; label: string }> = [
+export const categories: ProductCategoryOption[] = [
   { id: "todos", label: "Tudo" },
   { id: "vestidos", label: "Vestidos" },
   { id: "conjuntos", label: "Conjuntos" },

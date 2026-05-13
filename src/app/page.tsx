@@ -1,4 +1,3 @@
-import { BrandStory } from "@/components/sections/BrandStory";
 import { Hero } from "@/components/sections/Hero";
 import { Highlights } from "@/components/sections/Highlights";
 import { ProductGrid } from "@/components/sections/ProductGrid";
@@ -12,7 +11,6 @@ export default function Home() {
       <main>
         <Hero />
         <ProductGrid />
-        <BrandStory />
         <Highlights />
       </main>
       <Footer />
